@@ -15,6 +15,9 @@
       },
       "hive-site" : {
         "javax.jdo.option.ConnectionPassword" : "admin"
+      },
+      "nagios-env" : {
+        "nagios_contact" : "admin@localhost"
       }
     }
 }

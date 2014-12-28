@@ -30,7 +30,7 @@ yum install -y java7-devel
 curl -O http://public-repo-1.hortonworks.com/ambari/centos6/1.x/updates/${AMBARI_VERSION}/ambari.repo
 cp ambari.repo /etc/yum.repos.d/
 
-JAVA_HOME=$(readlink -f $(which java) | sed "s|/bin/java||")
+JAVA_HOME=$(dirname $(dirname $(readlink -e /usr/bin/javac)))
 yum install -y ambari-agent
 sed -i "s/^.*hostname=localhost/hostname=${MASTER_HOSTNAME}/" \
     /etc/ambari-agent/conf/ambari-agent.ini

@@ -17,7 +17,7 @@
         "javax.jdo.option.ConnectionPassword" : "admin"
       },
       "nagios-env" : {
-        "nagios_contact" : "admin@localhost"
+        "nagios_contact" : "root@localhost"
       }
     }
 }

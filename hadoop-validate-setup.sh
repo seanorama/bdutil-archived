@@ -52,11 +52,16 @@ HADOOP_CMD="${HADOOP_CMD:-${HADOOP_PREFIX}/bin/hadoop}"
 HADOOP_EXAMPLES_JAR=''
 
 #find under HADOOP_PREFIX (tar ball install)
-HADOOP_EXAMPLES_JAR=$(find ${HADOOP_PREFIX} -name 'hadoop-*examples-*.jar' | grep -v source | head -n1)
+HADOOP_EXAMPLES_JAR=$(find ${HADOOP_PREFIX} -name 'hadoop-*examples*.jar' | grep -v source | head -n1)
 
 #if its not found look under /usr/*/hadoop* (rpm/deb installs)
 if [[ "${HADOOP_EXAMPLES_JAR}" == '' ]]; then
-  HADOOP_EXAMPLES_JAR=$(find /usr/*/hadoop* -name 'hadoop-*examples-*.jar' | grep -v source | head -n1)
+  HADOOP_EXAMPLES_JAR=$(find /usr/*/hadoop* -name 'hadoop-*examples*.jar' | grep -v source | head -n1)
+fi
+
+#if still not found, look under /usr/*/current/hadoop-mapreduce-client
+if [[ "${HADOOP_EXAMPLES_JAR}" == '' ]]; then
+  HADOOP_EXAMPLES_JAR=$(find -H /usr/*/current/hadoop-mapreduce-client -name 'hadoop-*examples*.jar' | grep -v source | head -n1)
 fi
 
 #if it is still empty then dont run the tests
@@ -86,7 +91,7 @@ echo 'Starting teragen....'
 
 #run tera gen
 echo ${TERA_GEN_CMD}
-eval ${TERA_GEN_CMD}
+time eval ${TERA_GEN_CMD}
 EXIT_CODE=$?
 echo 'Listing teragen output...'
 echo ${TERA_GEN_LIST_CMD}
@@ -100,7 +105,7 @@ echo 'Teragen passed starting terasort....'
 
 #run tera sort
 echo ${TERA_SORT_CMD}
-eval ${TERA_SORT_CMD}
+time eval ${TERA_SORT_CMD}
 EXIT_CODE=$?
 echo 'Listing terasort output...'
 echo ${TERA_SORT_LIST_CMD}
@@ -113,7 +118,7 @@ echo 'Terasort passed starting teravalidate....'
 
 #run tera validate
 echo ${TERA_VALIDATE_CMD}
-eval ${TERA_VALIDATE_CMD}
+time eval ${TERA_VALIDATE_CMD}
 EXIT_CODE=$?
 echo 'Listing teravalidate output...'
 echo ${TERA_VALIDATE_LIST_CMD}

@@ -27,13 +27,22 @@ service iptables stop
 yum install -y java7-devel
 
 # Get Repo
-curl -O http://public-repo-1.hortonworks.com/ambari/centos6/1.x/updates/${AMBARI_VERSION}/ambari.repo
-cp ambari.repo /etc/yum.repos.d/
+curl -o /etc/yum.repos.d/ambari.repo http://public-repo-1.hortonworks.com/ambari/centos6/1.x/updates/${AMBARI_VERSION}/ambari.repo
 
-JAVA_HOME=$(dirname $(dirname $(readlink -e $(which javac))))
+JAVA_HOME=/etc/alternatives/java_sdk
 yum install -y ambari-agent
 sed -i "s/^.*hostname=localhost/hostname=${MASTER_HOSTNAME}/" \
     /etc/ambari-agent/conf/ambari-agent.ini
+
+# script to detect public address of google compute instances
+cat > /etc/ambari-agent/conf/public-hostname.sh <<-'EOF'
+#!/usr/bin/env bash
+curl -Ls -m 5 http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip -H "Metadata-Flavor: Google"
+exit 0
+EOF
+chmod +x /etc/ambari-agent/conf/public-hostname.sh
+sed -i "/\[agent\]/ a public_hostname_script=\/etc\/ambari-agent\/conf\/public-hostname.sh" /etc/ambari-agent/conf/ambari-agent.ini
+
 service ambari-agent start
 
 if [[ $(hostname) == ${MASTER_HOSTNAME} ]]; then
